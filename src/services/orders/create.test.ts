@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 
 import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { ORDER_CREATED } from '../../consts/ResponseMessages';
-import { Order } from '../../typeorm/entities/orders/Order';
+import { OrderEntity } from '../../typeorm/entities/orders/OrderEntity';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
@@ -19,7 +19,7 @@ jest.mock('typeorm', () => {
 });
 jest.mock('../../adapters/bookingEngine');
 
-const repositoryCreationEntity: Order = {
+const repositoryCreationEntity: OrderEntity = {
   id: 1,
   product_id: 'product_id',
   employee_id: 'employee_id',

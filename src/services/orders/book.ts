@@ -2,19 +2,20 @@ import { NextFunction, Request, Response } from 'express';
 import { getRepository } from 'typeorm';
 
 import { booking } from 'adapters/bookingEngine';
-import { Order } from 'typeorm/entities/orders/Order';
+import { OrderEntity } from 'typeorm/entities/orders/OrderEntity';
 
 import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { ORDER_CREATED } from '../../consts/ResponseMessages';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
+import { Order } from '../models/order';
 
 export const book = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
   const { personName, identificationNumber, mobilePhone } = req.body;
 
-  const orderRepository = getRepository(Order);
+  const orderRepository = getRepository(OrderEntity);
 
   try {
     const order = await orderRepository.findOne(id);
@@ -31,7 +32,7 @@ export const book = async (req: Request, res: Response, next: NextFunction) => {
 
     await orderRepository.save(order);
 
-    res.customSuccess(SUCCESS, ORDER_CREATED, order);
+    res.customSuccess(SUCCESS, ORDER_CREATED, new Order(order));
   } catch (e) {
     if (e instanceof CustomError) {
       return next(e);

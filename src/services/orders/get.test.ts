@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 
 import { getBookingInfo } from '../../adapters/bookingEngine';
 import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
-import { Order } from '../../typeorm/entities/orders/Order';
+import { OrderEntity } from '../../typeorm/entities/orders/OrderEntity';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { OrderBookingStatus } from '../../types/BookingEngine';
 import { ErrorType } from '../../types/CustomError';
@@ -20,14 +20,14 @@ jest.mock('typeorm', () => {
 });
 jest.mock('../../adapters/bookingEngine');
 
-const repositoryCreationEntity: Order = {
+const repositoryCreationEntity: OrderEntity = {
   id: 1,
   product_id: 'product_id',
   employee_id: 'employee_id',
   status: OrderStatus.CREATED,
 } as any;
 
-const bookingUpdatedRepositoryCreationEntity: Order = {
+const bookingUpdatedRepositoryCreationEntity: OrderEntity = {
   id: 1,
   product_id: 'product_id',
   employee_id: 'employee_id',

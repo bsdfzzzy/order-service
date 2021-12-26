@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateCol
 import { OrderStatus } from './types';
 
 @Entity('orders')
-export class Order {
+export class OrderEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
