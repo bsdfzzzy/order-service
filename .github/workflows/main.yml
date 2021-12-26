@@ -28,7 +28,7 @@ jobs:
         run: npm run lint
 
       - name: Unit Test
-        run: npm run jest-test
+        run: npm run unit-test
 
       - name: Build 🏗️
         run: npm run build
