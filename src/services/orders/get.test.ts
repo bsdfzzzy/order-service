@@ -1,11 +1,11 @@
 import { when } from 'jest-when';
 import { getRepository } from 'typeorm';
 
-import { getBookingInfo } from '../../adapters/bookingEngine';
-import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
+import { getBookingInfo, getCancellationInfo } from '../../adapters/bookingEngine';
+import { GET_ORDER_SUCCESS, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { OrderEntity } from '../../typeorm/entities/orders/OrderEntity';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
-import { OrderBookingStatus } from '../../types/BookingEngine';
+import { OrderBookingStatus, OrderCancellationStatus } from '../../types/BookingEngine';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
 import { Order } from '../models/order';
@@ -21,20 +21,24 @@ jest.mock('typeorm', () => {
 });
 jest.mock('../../adapters/bookingEngine');
 
-const repositoryCreationEntity: OrderEntity = {
+const repositoryCreationEntity = {
   id: 1,
   product_id: 'product_id',
   employee_id: 'employee_id',
   status: OrderStatus.CREATED,
 } as any;
 
-const bookingUpdatedRepositoryCreationEntity: OrderEntity = {
-  id: 1,
-  product_id: 'product_id',
-  employee_id: 'employee_id',
+const bookingUpdatedRepositoryCreationEntity = {
+  ...repositoryCreationEntity,
   status: OrderStatus.BOOKING_SUCCESSED,
   booking_evidence_id: 'booking_evidence_id',
 } as any;
+
+const cancellationUpdatedRepositoryCreationEntity = {
+  ...repositoryCreationEntity,
+  status: OrderStatus.CANCELLED,
+  cancellation_evidence_id: 'cancellation_evidence_id',
+};
 
 describe('get order information', () => {
   const request: any = {
@@ -59,7 +63,11 @@ describe('get order information', () => {
 
     await get(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, null, new Order(repositoryCreationEntity));
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
+      SUCCESS,
+      GET_ORDER_SUCCESS,
+      new Order(repositoryCreationEntity),
+    );
   });
 
   it('should get booking information when order status is BOOKING', async () => {
@@ -81,8 +89,32 @@ describe('get order information', () => {
 
     expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
       SUCCESS,
-      null,
+      GET_ORDER_SUCCESS,
       new Order(bookingUpdatedRepositoryCreationEntity),
+    );
+  });
+
+  it('should get cancellation information when order status is CANCELLING', async () => {
+    when(stubFindOne)
+      .calledWith(1)
+      .mockReturnValue({
+        ...repositoryCreationEntity,
+        status: OrderStatus.CANCELLING,
+        cancellation_evidence_id: 'cancellation_evidence_id',
+      });
+    when(getCancellationInfo)
+      .calledWith('cancellation_evidence_id')
+      .mockResolvedValue({ id: 'cancellation_evidence_id', finished: true, result: OrderCancellationStatus.SUCCEED });
+    when(stubSave)
+      .calledWith(bookingUpdatedRepositoryCreationEntity)
+      .mockResolvedValue(bookingUpdatedRepositoryCreationEntity);
+
+    await get(request, fakeResponse, spyNext);
+
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
+      SUCCESS,
+      GET_ORDER_SUCCESS,
+      new Order(cancellationUpdatedRepositoryCreationEntity),
     );
   });
 

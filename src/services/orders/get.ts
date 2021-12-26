@@ -3,10 +3,10 @@ import { getRepository } from 'typeorm';
 
 import { OrderEntity } from 'typeorm/entities/orders/OrderEntity';
 
-import { getBookingInfo } from '../../adapters/bookingEngine';
-import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
+import { getBookingInfo, getCancellationInfo } from '../../adapters/bookingEngine';
+import { GET_ORDER_SUCCESS, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
-import { OrderBookingStatus } from '../../types/BookingEngine';
+import { OrderBookingStatus, OrderCancellationStatus } from '../../types/BookingEngine';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
 import { Order } from '../models/order';
@@ -30,7 +30,18 @@ export const get = async (req: Request, res: Response, next: NextFunction) => {
       }
     }
 
-    res.customSuccess(SUCCESS, null, new Order(order));
+    if (order.status === OrderStatus.CANCELLING) {
+      const cancellationInfo = await getCancellationInfo(order.cancellation_evidence_id);
+      if (cancellationInfo.finished) {
+        order.status =
+          cancellationInfo.result === OrderCancellationStatus.SUCCEED
+            ? OrderStatus.CANCELLED
+            : OrderStatus.CANCELL_FAILED;
+        await orderRepository.save(order);
+      }
+    }
+
+    res.customSuccess(SUCCESS, GET_ORDER_SUCCESS, new Order(order));
   } catch (e) {
     if (e instanceof CustomError) {
       return next(e);

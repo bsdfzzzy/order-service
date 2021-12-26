@@ -28,6 +28,8 @@ export const BOOKING_SYSTEM_SERVER_ERROR_WHEN_GETTING_CANCELLATION_INFO =
 
 export const ORDER_CREATED = 'Order successfully created.';
 
+export const GET_ORDER_SUCCESS = 'Get order successfully.';
+
 export const UNKNOWN_ERROR = 'unknown error';
 
 export const BOOKING_EVIDENCE_ID_INVALID = 'The booking evidence id is not correct';
