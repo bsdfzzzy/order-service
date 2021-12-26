@@ -1,0 +1,32 @@
+fileignoreconfig:
+- filename: .env
+  checksum: b4608a5ad922cdd5817a4a05d2828898fc44cd5761903fdea7a00b6a1742d0a1
+- filename: .github/workflows/main.yml
+  checksum: f0e85b89621d85d51262d70ba8827f12be239f27b47402c91795934cb78eeab2
+- filename: config/prod.env
+  checksum: e65eb16fde696c2c1201e826df07f1a1b327d30ba724fac7aa7207cb101f1b27
+- filename: config/stage.env
+  checksum: 0a7b9ab5696ff14a8a62aba1db79dbb31269c161e09d48e80e6a1c78d35ecbbb
+- filename: coverage/lcov-report/base.css
+  checksum: d8f63ddcb2ba75c2c678d401d19519b14253caba279ba3b20ea318ac22809a84
+- filename: coverage/lcov-report/prettify.js
+  checksum: 7bcccf321d8300caad09fe4921871806b5b1c6ae3a9f36f3ebf3f40389c37e9c
+- filename: coverage/lcov-report/sorter.js
+  checksum: 28053c190986c5966ecb8f5f90db6dd4ca7995be7314f6572dd60444408d431a
+- filename: package-lock.json
+  checksum: 117099972c68afc3c67913f128c9fc67083cac5e3c55417b1eff3e03e385e83b
+- filename: src/adapters/bookingEngine.test.ts
+  checksum: 8df8c7f3b522132187ac61b4fc44887fced39ec9f0adcf9f2913eea3d79436db
+- filename: src/adapters/bookingEngine.ts
+  checksum: 6c9693728b8fe123adb3e5044b742ad26c533ff48c15abdffefb5136190e08b1
+- filename: src/typeorm/config/ormconfig-seed.ts
+  checksum: dc3601687d6c3ca97ef89555e4dea1842afb991bcc9bd91c3cf450200a40bd99
+- filename: src/typeorm/config/ormconfig.ts
+  checksum: b26ae5482b94099f20f8de1e961128b538f307a02203f7fb420b6cf2d446e2a3
+- filename: src/typeorm/migrations/1640444887910-CreateOrders.ts
+  checksum: 4ef9a7c1dd569c7c01aa7666114f5c9c90ce530de27a9b5f7b84a6f426a4f5b3
+- filename: src/types/CustomError.ts
+  checksum: 88f928880ec7b947fd3027d66889fe8804f49dd4299969e2435d9cfebfd9d61e
+- filename: yarn.lock
+  checksum: 97e3ffc086f174ce4f8416c5e9d1d5b2503f26ac1e4225f2690ba95e81ead2bb
+version: "1.0"

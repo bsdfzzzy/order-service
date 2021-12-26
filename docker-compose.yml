@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  be_order:
+    container_name: 'be_order'
+    build: .
+    restart: always
+    volumes:
+      - .:/app/
+      - /app/node_modules

@@ -1,0 +1,97 @@
+{
+  "name": "order-service",
+  "version": "1.0.0",
+  "description": "RESTful API For Order Service.",
+  "scripts": {
+    "dev": "debug=* NODE_PATH=./src ts-node-dev --respawn ./src/index.ts",
+    "build": "rimraf dist && tsc",
+    "start": "NODE_PATH=./dist node ./dist/index.js",
+    "prepare": "husky install",
+    "lint": "eslint --max-warnings 0 --ext .js,ts src",
+    "lint-staged-husky": "lint-staged",
+    "lint-prettier": "prettier --config .prettierrc --list-different '{src,test}/**/*.{ts,js,css,scss}'",
+    "prettier": "prettier --config .prettierrc --write './**/*.{ts,js,css,scss,json,md}'",
+    "test": "NODE_PATH=./src mocha --require ts-node/register 'test/integration/**/*.test.ts' --timeout 20000 --exit",
+    "jest-test": "NODE_PATH=./src jest --coverage",
+    "commit": "git-cz",
+    "docker:dev": "docker-compose --file docker-compose.yml --file docker-compose.dev.yml --compatibility up --build",
+    "docker:stage": "docker-compose --file docker-compose.yml --file docker-compose.stage.yml --compatibility up --build",
+    "docker:prod": "docker-compose --file docker-compose.yml --file docker-compose.prod.yml --compatibility up --build",
+    "migration:run": "NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:run --config ./src/typeorm/config/ormconfig.ts",
+    "migration:run:dev": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:run --config ./src/typeorm/config/ormconfig.ts",
+    "migration:revert": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/typeorm/cli.js migration:revert --config ./src/typeorm/config/ormconfig.ts",
+    "migration:generate": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/.bin/typeorm migration:generate --pretty --config ./src/typeorm/config/ormconfig.ts -n ",
+    "migration:create": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/.bin/typeorm migration:create --config ./src/typeorm/config/ormconfig.ts -n ",
+    "seed:run": "NODE_PATH=./src ts-node ./node_modules/.bin/typeorm migration:run --config ./src/typeorm/config/ormconfig-seed.ts",
+    "seed:run:dev": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/.bin/typeorm migration:run --config ./src/typeorm/config/ormconfig-seed.ts",
+    "seed:create": "PG_HOST=localhost NODE_PATH=./src ts-node ./node_modules/.bin/typeorm migration:create --config ./src/typeorm/config/ormconfig-seed.ts -n "
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "pg": "^8.7.1",
+    "reflect-metadata": "^0.1.13",
+    "typeorm": "^0.2.41",
+    "typeorm-naming-strategies": "^2.0.0",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^15.0.0",
+    "@commitlint/config-conventional": "^15.0.0",
+    "@types/body-parser": "^1.19.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/helmet": "4.0.0",
+    "@types/jest": "^27.0.3",
+    "@types/jest-when": "^2.7.4",
+    "@types/jsonwebtoken": "^8.5.6",
+    "@types/morgan": "^1.9.3",
+    "@types/node": "^17.0.2",
+    "@types/supertest": "^2.0.11",
+    "@types/validator": "^13.7.1",
+    "@typescript-eslint/eslint-plugin": "^5.8.0",
+    "@typescript-eslint/parser": "^5.8.0",
+    "babel-jest": "^27.4.5",
+    "commitizen": "^4.2.4",
+    "dotenv": "^10.0.0",
+    "eslint": "^8.5.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-no-array-reduce": "^1.0.39",
+    "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.4",
+    "jest": "^27.4.5",
+    "jest-when": "^3.5.0",
+    "lint-staged": "^12.1.4",
+    "nyc": "^15.1.0",
+    "prettier": "^2.5.1",
+    "pretty-quick": "^3.1.3",
+    "supertest": "^6.1.6",
+    "ts-jest": "^27.1.2",
+    "ts-node": "10.4.0",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "4.5.4"
+  },
+  "lint-staged": {
+    "*": [
+      "pretty-quick --staged"
+    ],
+    "{src,test}/**/*.{js,ts}": [
+      "eslint --max-warnings 0"
+    ]
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  }
+}
