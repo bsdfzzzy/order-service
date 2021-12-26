@@ -2,6 +2,8 @@ import axios from 'axios';
 import { when } from 'jest-when';
 
 import { BookingRequestBody } from '../types/BookingEngine';
+import { ErrorType } from '../types/CustomError';
+import { CustomError } from '../utils/response/CustomError';
 
 import { book } from './bookingEngine';
 
@@ -29,6 +31,22 @@ describe('bookingEngine', () => {
         headers: { apiKey: 'apiKey' },
       });
       expect(evidenceId).toEqual('booking_evidence_id');
+    });
+
+    it('should throw custom error when booking system return error', async () => {
+      const errorResponse = {
+        errors: {
+          errorCode: '0',
+          errorMessage: 'Server Error',
+        },
+      };
+      (axios.post as jest.Mock).mockRejectedValue(errorResponse);
+
+      await expect(book(requestBody)).rejects.toThrow(
+        new CustomError(500, ErrorType.thirdServiceError, 'Booking order failed when calling booking system.', [
+          errorResponse.toString(),
+        ]),
+      );
     });
   });
 });

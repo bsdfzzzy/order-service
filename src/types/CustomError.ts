@@ -7,6 +7,12 @@ export type ErrorResponse = {
   stack?: string;
 };
 
-export type ErrorType = 'General' | 'Raw' | 'Validation' | 'Unauthorized';
+export enum ErrorType {
+  General = 'General',
+  Raw = 'Raw',
+  Validation = 'Validation',
+  Unauthorized = 'Unauthorized',
+  thirdServiceError = '3rdServiceError',
+}
 
 export type ErrorValidation = { [key: string]: string };

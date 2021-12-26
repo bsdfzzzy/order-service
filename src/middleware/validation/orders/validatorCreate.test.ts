@@ -1,9 +1,10 @@
+import { ErrorType } from '../../../types/CustomError';
 import { CustomError } from '../../../utils/response/CustomError';
 
 import { validatorCreate } from './validatorCreate';
 
 describe('validatorCreate', () => {
-  const validationError = new CustomError(400, 'Validation', 'Create order validation error', null, null);
+  const validationError = new CustomError(400, ErrorType.Validation, 'Create order validation error', null, null);
   let spyNext: jest.Mock;
   beforeEach(() => {
     spyNext = jest.fn();

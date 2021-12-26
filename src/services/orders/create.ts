@@ -9,16 +9,20 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
 
   const orderRepository = getRepository(Order);
 
-  if (!managerId) {
-    const bookingEvidenceId = await book({
-      productId,
-      ...employeeInfo,
-    });
-    const order = await orderRepository.create({
-      product_id: productId,
-      employee_id: employeeId,
-      booking_evidence_id: bookingEvidenceId,
-    });
-    res.customSuccess(200, 'Order successfully saved.', order);
+  try {
+    if (!managerId) {
+      const bookingEvidenceId = await book({
+        productId,
+        ...employeeInfo,
+      });
+      const order = await orderRepository.create({
+        product_id: productId,
+        employee_id: employeeId,
+        booking_evidence_id: bookingEvidenceId,
+      });
+      res.customSuccess(200, 'Order successfully saved.', order);
+    }
+  } catch (e) {
+    return next(e);
   }
 };

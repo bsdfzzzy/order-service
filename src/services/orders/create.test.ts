@@ -4,7 +4,9 @@ import { getRepository } from 'typeorm';
 import { book } from '../../adapters/bookingEngine';
 import { Order } from '../../typeorm/entities/orders/Order';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
+import { ErrorType } from '../../types/CustomError';
 import { EmployeeInfo } from '../../types/Employee';
+import { CustomError } from '../../utils/response/CustomError';
 
 import { create } from './create';
 
@@ -32,12 +34,20 @@ const employeeInfo: EmployeeInfo = {
 };
 
 describe('create order', () => {
+  const request: any = {
+    body: {
+      productId: 'product_id',
+      employeeId: 'employee_id',
+      employeeInfo,
+    },
+  };
+  const spyCustomSuccess = jest.fn();
+  const fakeResponse: any = {
+    customSuccess: spyCustomSuccess,
+  };
+  const spyNext = jest.fn();
+
   it('should successfully create order', async () => {
-    const spyCustomSuccess = jest.fn();
-    const fakeResponse: any = {
-      customSuccess: spyCustomSuccess,
-    };
-    const spyNext = jest.fn();
     const stubCreateOrder = jest.fn();
     when(stubCreateOrder)
       .calledWith({ product_id: 'product_id', employee_id: 'employee_id', booking_evidence_id: 'booking_evidence_id' })
@@ -52,15 +62,24 @@ describe('create order', () => {
       create: stubCreateOrder,
     });
 
-    const request: any = {
-      body: {
-        productId: 'product_id',
-        employeeId: 'employee_id',
-        employeeInfo,
-      },
-    };
     await create(request, fakeResponse, spyNext);
 
     expect(fakeResponse.customSuccess).toHaveBeenCalledWith(200, 'Order successfully saved.', repositoryCreationEntity);
+  });
+
+  it('next function should call error when the book method rejects an error', async () => {
+    const customError = new CustomError(500, ErrorType.thirdServiceError, 'any message');
+    when(book)
+      .calledWith({
+        productId: 'product_id',
+        ...employeeInfo,
+      })
+      .mockRejectedValue(customError);
+
+    await create(request, fakeResponse, spyNext);
+
+    expect(spyNext).toHaveBeenCalledWith(customError);
+    expect(spyNext).toHaveBeenCalledTimes(1);
+    expect(spyCustomSuccess).not.toHaveBeenCalled();
   });
 });
