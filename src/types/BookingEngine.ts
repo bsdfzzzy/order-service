@@ -10,3 +10,8 @@ export enum OrderBookingStatus {
   SUCCEED = 'SUCCEED',
   FAILED = 'FAILED',
 }
+
+export type BookingInfoResponse = {
+  finished: boolean;
+  result?: OrderBookingStatus;
+};
