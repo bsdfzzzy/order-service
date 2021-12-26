@@ -4,6 +4,9 @@ import { getRepository } from 'typeorm';
 import { book } from 'adapters/bookingEngine';
 import { Order } from 'typeorm/entities/orders/Order';
 
+import { SUCCESS } from '../../consts';
+import { ORDER_CREATED } from '../../consts/ResponseMessages';
+
 export const create = async (req: Request, res: Response, next: NextFunction) => {
   const { productId, employeeId, managerId, employeeInfo } = req.body;
 
@@ -20,7 +23,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
         employee_id: employeeId,
         booking_evidence_id: bookingEvidenceId,
       });
-      res.customSuccess(200, 'Order successfully saved.', order);
+      res.customSuccess(SUCCESS, ORDER_CREATED, order);
     }
   } catch (e) {
     return next(e);

@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { BOOKING_SYSTEM_SERVER_ERROR_WHEN_BOOKING, SERVER_ERROR } from '../consts';
 import { BookingRequestBody } from '../types/BookingEngine';
 import { ErrorType } from '../types/CustomError';
 import { CustomError } from '../utils/response/CustomError';
@@ -13,7 +14,7 @@ export const book = async (requestBody: BookingRequestBody): Promise<string> => 
     });
     return evidenceId;
   } catch (e) {
-    throw new CustomError(500, ErrorType.thirdServiceError, 'Booking order failed when calling booking system.', [
+    throw new CustomError(SERVER_ERROR, ErrorType.thirdServiceError, BOOKING_SYSTEM_SERVER_ERROR_WHEN_BOOKING, [
       e.toString(),
     ]);
   }

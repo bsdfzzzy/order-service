@@ -2,6 +2,8 @@ import { when } from 'jest-when';
 import { getRepository } from 'typeorm';
 
 import { book } from '../../adapters/bookingEngine';
+import { SERVER_ERROR, SUCCESS } from '../../consts';
+import { ORDER_CREATED } from '../../consts/ResponseMessages';
 import { Order } from '../../typeorm/entities/orders/Order';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
@@ -64,11 +66,11 @@ describe('create order', () => {
 
     await create(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(200, 'Order successfully saved.', repositoryCreationEntity);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_CREATED, repositoryCreationEntity);
   });
 
   it('next function should call error when the book method rejects an error', async () => {
-    const customError = new CustomError(500, ErrorType.thirdServiceError, 'any message');
+    const customError = new CustomError(SERVER_ERROR, ErrorType.thirdServiceError, 'any message');
     when(book)
       .calledWith({
         productId: 'product_id',

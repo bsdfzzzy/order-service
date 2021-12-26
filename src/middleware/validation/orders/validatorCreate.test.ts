@@ -1,10 +1,17 @@
+import { BAD_REQUEST, ORDER_CREATION_REQUEST_BODY_VALIDATION_ERROR } from '../../../consts';
 import { ErrorType } from '../../../types/CustomError';
 import { CustomError } from '../../../utils/response/CustomError';
 
 import { validatorCreate } from './validatorCreate';
 
 describe('validatorCreate', () => {
-  const validationError = new CustomError(400, ErrorType.Validation, 'Create order validation error', null, null);
+  const validationError = new CustomError(
+    BAD_REQUEST,
+    ErrorType.Validation,
+    ORDER_CREATION_REQUEST_BODY_VALIDATION_ERROR,
+    null,
+    null,
+  );
   let spyNext: jest.Mock;
   beforeEach(() => {
     spyNext = jest.fn();
