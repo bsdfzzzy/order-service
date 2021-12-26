@@ -4,6 +4,10 @@ export const ORDER_BOOKING_REQUEST_BODY_VALIDATION_ERROR = 'Booking order valida
 
 export const ORDER_BOOKING_CONFIRMATION_REQUEST_BODY_VALIDATION_ERROR = 'Order booking confirmation validation error';
 
+export const ORDER_BOOKING_CONFIRMATION_SUCCEED = 'Booking confirmation has succeed';
+
+export const ORDER_BOOKING_SUCCEED = 'Order is booking now.';
+
 export const BOOKING_SYSTEM_SERVER_ERROR_WHEN_BOOKING = 'Booking order occured error when calling booking system.';
 
 export const BOOKING_SYSTEM_SERVER_ERROR_WHEN_GETTING_BOOKING_INFO =

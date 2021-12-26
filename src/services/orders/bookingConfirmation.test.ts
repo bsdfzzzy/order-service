@@ -1,15 +1,20 @@
 import { when } from 'jest-when';
 import { getRepository } from 'typeorm';
 
-import { BAD_REQUEST, BOOKING_EVIDENCE_ID_INVALID, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
-import { ORDER_CREATED } from '../../consts/ResponseMessages';
+import {
+  BAD_REQUEST,
+  BOOKING_EVIDENCE_ID_INVALID,
+  ORDER_BOOKING_CONFIRMATION_SUCCEED,
+  SERVER_ERROR,
+  SUCCESS,
+  UNKNOWN_ERROR,
+} from '../../consts';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { OrderBookingStatus } from '../../types/BookingEngine';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
 
 import { bookingConfirmation } from './bookingConfirmation';
-import { create } from './create';
 
 jest.mock('typeorm', () => {
   const typeorm = jest.requireActual('typeorm');
@@ -57,7 +62,7 @@ describe('booking conformation', () => {
     save: stubSave,
   });
 
-  it('should successfully book order', async () => {
+  it('should successfully confirm booking', async () => {
     when(stubFindOne).calledWith(1).mockReturnValue(repositoryCreationEntity);
     when(stubSave)
       .calledWith({
@@ -68,7 +73,7 @@ describe('booking conformation', () => {
 
     await bookingConfirmation(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_CREATED, updatedRepositoryCreationEntity);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_BOOKING_CONFIRMATION_SUCCEED);
   });
 
   it('book order failed', async () => {
@@ -92,11 +97,7 @@ describe('booking conformation', () => {
 
     await bookingConfirmation(failedRequest, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
-      SUCCESS,
-      ORDER_CREATED,
-      updatedFailedRepositoryCreationEntity,
-    );
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_BOOKING_CONFIRMATION_SUCCEED);
   });
 
   it('next function should call error when the given booking evidence is not correct', async () => {

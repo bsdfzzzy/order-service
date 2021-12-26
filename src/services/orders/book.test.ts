@@ -2,7 +2,7 @@ import { when } from 'jest-when';
 import { getRepository } from 'typeorm';
 
 import { booking } from '../../adapters/bookingEngine';
-import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
+import { ORDER_BOOKING_SUCCEED, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { ORDER_CREATED } from '../../consts/ResponseMessages';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
@@ -82,7 +82,11 @@ describe('book order', () => {
 
     await book(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_CREATED, updatedRepositoryCreationEntity);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
+      SUCCESS,
+      ORDER_BOOKING_SUCCEED,
+      updatedRepositoryCreationEntity,
+    );
   });
 
   it('next function should call error when the book method rejects an error', async () => {

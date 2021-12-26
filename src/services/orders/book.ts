@@ -4,8 +4,7 @@ import { getRepository } from 'typeorm';
 import { booking } from 'adapters/bookingEngine';
 import { OrderEntity } from 'typeorm/entities/orders/OrderEntity';
 
-import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
-import { ORDER_CREATED } from '../../consts/ResponseMessages';
+import { ORDER_BOOKING_SUCCEED, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
@@ -32,7 +31,7 @@ export const book = async (req: Request, res: Response, next: NextFunction) => {
 
     await orderRepository.save(order);
 
-    res.customSuccess(SUCCESS, ORDER_CREATED, new Order(order));
+    res.customSuccess(SUCCESS, ORDER_BOOKING_SUCCEED, new Order(order));
   } catch (e) {
     if (e instanceof CustomError) {
       return next(e);
