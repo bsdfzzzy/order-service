@@ -1,4 +1,4 @@
-import { CustomError } from '../../../utils/response/custom-error/CustomError';
+import { CustomError } from '../../../utils/response/CustomError';
 
 import { validatorCreate } from './validatorCreate';
 
@@ -9,7 +9,7 @@ describe('validatorCreate', () => {
     spyNext = jest.fn();
   });
 
-  it('should return validation error when input is invalid', async () => {
+  it('next function should call validation error when input is invalid', async () => {
     const invalidRequest = {
       body: {
         employeeId: '',
@@ -43,7 +43,7 @@ describe('validatorCreate', () => {
     expect(spyNext).toHaveBeenNthCalledWith(3, validationError);
   });
 
-  it('should return nothing when validation passed', async () => {
+  it('next function should call nothing when validation passed', async () => {
     const validRequest = {
       body: {
         employeeId: 'id',
@@ -54,6 +54,7 @@ describe('validatorCreate', () => {
 
     const result = await validatorCreate(validRequest as any, {} as any, spyNext);
 
-    expect(spyNext).toBeUndefined();
+    expect(spyNext).toHaveBeenCalled();
+    expect(spyNext).not.toHaveBeenCalledWith(expect.anything());
   });
 });

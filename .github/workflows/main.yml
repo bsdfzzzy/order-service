@@ -27,5 +27,8 @@ jobs:
       - name: Lint ✅
         run: npm run lint
 
+      - name: Unit Test
+        run: npm run jest-test
+
       - name: Build 🏗️
         run: npm run build
