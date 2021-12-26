@@ -2,7 +2,7 @@ fileignoreconfig:
 - filename: .env
   checksum: b4608a5ad922cdd5817a4a05d2828898fc44cd5761903fdea7a00b6a1742d0a1
 - filename: .github/workflows/main.yml
-  checksum: f0e85b89621d85d51262d70ba8827f12be239f27b47402c91795934cb78eeab2
+  checksum: 45a4835aabdc7d7a81aa82ffd03e81eabceefcafa10449acabce508d69057ad7
 - filename: config/prod.env
   checksum: e65eb16fde696c2c1201e826df07f1a1b327d30ba724fac7aa7207cb101f1b27
 - filename: config/stage.env
