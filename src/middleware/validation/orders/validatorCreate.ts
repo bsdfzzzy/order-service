@@ -5,9 +5,9 @@ import { ErrorType } from '../../../types/CustomError';
 import { CustomError } from '../../../utils/response/CustomError';
 
 export const validatorCreate = async (req: Request, res: Response, next: NextFunction) => {
-  const { employeeId, productId, employeeInfo } = req.body;
+  const { employeeId, productId } = req.body;
 
-  if (!employeeId || !productId || !employeeInfo) {
+  if (!employeeId || !productId) {
     const validationError = new CustomError(
       BAD_REQUEST,
       ErrorType.Validation,

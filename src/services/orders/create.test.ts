@@ -1,13 +1,11 @@
 import { when } from 'jest-when';
 import { getRepository } from 'typeorm';
 
-import { book } from '../../adapters/bookingEngine';
-import { SERVER_ERROR, SUCCESS } from '../../consts';
+import { SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { ORDER_CREATED } from '../../consts/ResponseMessages';
 import { Order } from '../../typeorm/entities/orders/Order';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
-import { EmployeeInfo } from '../../types/Employee';
 import { CustomError } from '../../utils/response/CustomError';
 
 import { create } from './create';
@@ -25,22 +23,14 @@ const repositoryCreationEntity: Order = {
   id: 1,
   product_id: 'product_id',
   employee_id: 'employee_id',
-  status: OrderStatus.BOOKING,
-  booking_evidence_id: 'booking_evidence_id',
+  status: OrderStatus.CREATED,
 } as any;
-
-const employeeInfo: EmployeeInfo = {
-  name: 'name',
-  identificationNumber: '1111111111111111111111',
-  mobilePhone: '13800000000',
-};
 
 describe('create order', () => {
   const request: any = {
     body: {
       productId: 'product_id',
       employeeId: 'employee_id',
-      employeeInfo,
     },
   };
   const spyCustomSuccess = jest.fn();
@@ -48,40 +38,28 @@ describe('create order', () => {
     customSuccess: spyCustomSuccess,
   };
   const spyNext = jest.fn();
+  const stubCreateOrder = jest.fn();
+  (getRepository as jest.Mock).mockReturnValue({
+    create: stubCreateOrder,
+  });
 
   it('should successfully create order', async () => {
-    const stubCreateOrder = jest.fn();
     when(stubCreateOrder)
-      .calledWith({ product_id: 'product_id', employee_id: 'employee_id', booking_evidence_id: 'booking_evidence_id' })
+      .calledWith({ product_id: 'product_id', employee_id: 'employee_id' })
       .mockReturnValue(repositoryCreationEntity);
-    when(book)
-      .calledWith({
-        productId: 'product_id',
-        ...employeeInfo,
-      })
-      .mockResolvedValue('booking_evidence_id');
-    (getRepository as jest.Mock).mockReturnValue({
-      create: stubCreateOrder,
-    });
 
     await create(request, fakeResponse, spyNext);
 
     expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_CREATED, repositoryCreationEntity);
   });
 
-  it('next function should call error when the book method rejects an error', async () => {
-    const customError = new CustomError(SERVER_ERROR, ErrorType.thirdServiceError, 'any message');
-    when(book)
-      .calledWith({
-        productId: 'product_id',
-        ...employeeInfo,
-      })
-      .mockRejectedValue(customError);
+  it('should call custom error when there is dummy error occured', async () => {
+    stubCreateOrder.mockRejectedValue('dummy error');
 
     await create(request, fakeResponse, spyNext);
 
-    expect(spyNext).toHaveBeenCalledWith(customError);
-    expect(spyNext).toHaveBeenCalledTimes(1);
-    expect(spyCustomSuccess).not.toHaveBeenCalled();
+    expect(spyNext).toHaveBeenCalledWith(
+      new CustomError(SERVER_ERROR, ErrorType.Raw, UNKNOWN_ERROR, null, 'dummy error'),
+    );
   });
 });

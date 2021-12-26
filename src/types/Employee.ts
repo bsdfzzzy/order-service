@@ -1,5 +1,5 @@
 export type EmployeeInfo = {
-  name: string;
+  personName: string;
   identificationNumber: string;
   mobilePhone: string;
 };

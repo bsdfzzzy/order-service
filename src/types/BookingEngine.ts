@@ -1,6 +1,12 @@
 export type BookingRequestBody = {
+  orderId: number;
   productId: string;
-  name: string;
+  personName: string;
   identificationNumber: string;
   mobilePhone: string;
 };
+
+export enum OrderBookingStatus {
+  SUCCEED = 'SUCCEED',
+  FAILED = 'FAILED',
+}

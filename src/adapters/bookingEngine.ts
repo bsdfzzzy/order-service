@@ -5,7 +5,7 @@ import { BookingRequestBody } from '../types/BookingEngine';
 import { ErrorType } from '../types/CustomError';
 import { CustomError } from '../utils/response/CustomError';
 
-export const book = async (requestBody: BookingRequestBody): Promise<string> => {
+export const booking = async (requestBody: BookingRequestBody): Promise<string> => {
   try {
     const {
       data: { evidenceId },

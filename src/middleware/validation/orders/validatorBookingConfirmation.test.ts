@@ -1,14 +1,15 @@
-import { BAD_REQUEST, ORDER_CREATION_REQUEST_BODY_VALIDATION_ERROR } from '../../../consts';
+import { BAD_REQUEST, ORDER_BOOKING_CONFIRMATION_REQUEST_BODY_VALIDATION_ERROR } from '../../../consts';
+import { OrderBookingStatus } from '../../../types/BookingEngine';
 import { ErrorType } from '../../../types/CustomError';
 import { CustomError } from '../../../utils/response/CustomError';
 
-import { validatorCreate } from './validatorCreate';
+import { validatorBookingConfirmation } from './validatorBookingConfirmation';
 
-describe('validatorCreate', () => {
+describe('validatorBookingConfirmation', () => {
   const validationError = new CustomError(
     BAD_REQUEST,
     ErrorType.Validation,
-    ORDER_CREATION_REQUEST_BODY_VALIDATION_ERROR,
+    ORDER_BOOKING_CONFIRMATION_REQUEST_BODY_VALIDATION_ERROR,
     null,
     null,
   );
@@ -20,43 +21,31 @@ describe('validatorCreate', () => {
   it('next function should call validation error when input is invalid', async () => {
     const invalidRequest = {
       body: {
-        employeeId: '',
-        productId: '',
+        result: '',
       },
     };
 
     const invalidRequest2 = {
       body: {
-        employeeId: 'id',
-        productId: '',
+        result: 'Dummy',
       },
     };
 
-    const invalidRequest3 = {
-      body: {
-        employeeId: '',
-        productId: 'id',
-      },
-    };
-
-    const result = await validatorCreate(invalidRequest as any, {} as any, spyNext);
-    const result2 = await validatorCreate(invalidRequest2 as any, {} as any, spyNext);
-    const result3 = await validatorCreate(invalidRequest3 as any, {} as any, spyNext);
+    const result = await validatorBookingConfirmation(invalidRequest as any, {} as any, spyNext);
+    const result2 = await validatorBookingConfirmation(invalidRequest2 as any, {} as any, spyNext);
 
     expect(spyNext).toHaveBeenNthCalledWith(1, validationError);
     expect(spyNext).toHaveBeenNthCalledWith(2, validationError);
-    expect(spyNext).toHaveBeenNthCalledWith(3, validationError);
   });
 
   it('next function should call nothing when validation passed', async () => {
     const validRequest = {
       body: {
-        employeeId: 'id',
-        productId: 'id',
+        result: OrderBookingStatus.SUCCEED,
       },
     };
 
-    const result = await validatorCreate(validRequest as any, {} as any, spyNext);
+    await validatorBookingConfirmation(validRequest as any, {} as any, spyNext);
 
     expect(spyNext).toHaveBeenCalled();
     expect(spyNext).not.toHaveBeenCalledWith(expect.anything());

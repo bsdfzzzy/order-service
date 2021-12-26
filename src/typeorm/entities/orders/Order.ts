@@ -21,7 +21,7 @@ export class Order {
   @Column({
     type: 'enum',
     enum: OrderStatus,
-    default: OrderStatus.BOOKING,
+    default: OrderStatus.CREATED,
   })
   status: OrderStatus;
 

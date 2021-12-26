@@ -5,13 +5,14 @@ import { BookingRequestBody } from '../types/BookingEngine';
 import { ErrorType } from '../types/CustomError';
 import { CustomError } from '../utils/response/CustomError';
 
-import { book } from './bookingEngine';
+import { booking } from './bookingEngine';
 
 jest.mock('axios');
 
 const requestBody: BookingRequestBody = {
+  orderId: 1,
   productId: 'product_id',
-  name: 'name',
+  personName: 'name',
   identificationNumber: '1111111111111111111111',
   mobilePhone: '13800000000',
 };
@@ -25,7 +26,7 @@ describe('bookingEngine', () => {
         },
       });
 
-      const evidenceId = await book(requestBody);
+      const evidenceId = await booking(requestBody);
 
       expect(axios.post).toHaveBeenCalledWith('https://api-gateway.com/booking-system/bookings', requestBody, {
         headers: { apiKey: 'apiKey' },
@@ -42,7 +43,7 @@ describe('bookingEngine', () => {
       };
       (axios.post as jest.Mock).mockRejectedValue(errorResponse);
 
-      await expect(book(requestBody)).rejects.toThrow(
+      await expect(booking(requestBody)).rejects.toThrow(
         new CustomError(SERVER_ERROR, ErrorType.thirdServiceError, BOOKING_SYSTEM_SERVER_ERROR_WHEN_BOOKING, [
           errorResponse.toString(),
         ]),
