@@ -3,18 +3,18 @@ import { getRepository } from 'typeorm';
 
 import {
   BAD_REQUEST,
-  BOOKING_EVIDENCE_ID_INVALID,
-  ORDER_BOOKING_CONFIRMATION_SUCCEED,
+  CANCELLATION_EVIDENCE_ID_INVALID,
+  ORDER_CANCELLATION_CONFIRMATION_SUCCEED,
   SERVER_ERROR,
   SUCCESS,
   UNKNOWN_ERROR,
 } from '../../consts';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
-import { OrderBookingStatus } from '../../types/BookingEngine';
+import { OrderCancellationStatus } from '../../types/BookingEngine';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
 
-import { bookingConfirmation } from './bookingConfirmation';
+import { cancellationConfirmation } from './cancellationConfirmation';
 
 jest.mock('typeorm', () => {
   const typeorm = jest.requireActual('typeorm');
@@ -24,30 +24,28 @@ jest.mock('typeorm', () => {
   };
 });
 
-const repositoryCreationEntity = {
-  id: 1,
-  product_id: 'product_id',
-  employee_id: 'employee_id',
-  status: OrderStatus.BOOKING,
-  booking_evidence_id: 'booking_evidence_id',
-};
-
-const updatedRepositoryCreationEntity = {
+const repositoryBookedEntity = {
   id: 1,
   product_id: 'product_id',
   employee_id: 'employee_id',
   status: OrderStatus.BOOKING_SUCCESSED,
   booking_evidence_id: 'booking_evidence_id',
+  cancellation_evidence_id: 'cancellation_evidence_id',
 };
 
-describe('booking conformation', () => {
+const updatedRepositoryCreationEntity = {
+  ...repositoryBookedEntity,
+  status: OrderStatus.CANCELLED,
+};
+
+describe('cancellation conformation', () => {
   const request: any = {
     params: {
       id: 1,
-      bid: 'booking_evidence_id',
+      cid: 'cancellation_evidence_id',
     },
     body: {
-      result: OrderBookingStatus.SUCCEED,
+      result: OrderCancellationStatus.SUCCEED,
     },
   };
   const spyCustomSuccess = jest.fn();
@@ -62,50 +60,50 @@ describe('booking conformation', () => {
     save: stubSave,
   });
 
-  it('should successfully confirm booking', async () => {
-    when(stubFindOne).calledWith(1).mockReturnValue(repositoryCreationEntity);
+  it('should successfully confirm cancellation', async () => {
+    when(stubFindOne).calledWith(1).mockReturnValue(repositoryBookedEntity);
     when(stubSave)
       .calledWith({
-        ...repositoryCreationEntity,
-        status: OrderStatus.BOOKING_SUCCESSED,
+        ...repositoryBookedEntity,
+        status: OrderStatus.CANCELLED,
       })
       .mockResolvedValue(updatedRepositoryCreationEntity);
 
-    await bookingConfirmation(request, fakeResponse, spyNext);
+    await cancellationConfirmation(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_BOOKING_CONFIRMATION_SUCCEED);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_CANCELLATION_CONFIRMATION_SUCCEED);
   });
 
-  it('book order failed', async () => {
+  it('cancel order failed', async () => {
     const failedRequest = {
       ...request,
       body: {
-        result: OrderBookingStatus.FAILED,
+        result: OrderCancellationStatus.FAILED,
       },
     };
     const updatedFailedRepositoryCreationEntity = {
       ...updatedRepositoryCreationEntity,
-      status: OrderStatus.BOOKING_FAILED,
+      status: OrderStatus.CANCELL_FAILED,
     };
-    when(stubFindOne).calledWith(1).mockReturnValue(repositoryCreationEntity);
+    when(stubFindOne).calledWith(1).mockReturnValue(repositoryBookedEntity);
     when(stubSave)
       .calledWith({
-        ...repositoryCreationEntity,
-        status: OrderStatus.BOOKING_FAILED,
+        ...repositoryBookedEntity,
+        status: OrderStatus.CANCELL_FAILED,
       })
       .mockResolvedValue(updatedFailedRepositoryCreationEntity);
 
-    await bookingConfirmation(failedRequest, fakeResponse, spyNext);
+    await cancellationConfirmation(failedRequest, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_BOOKING_CONFIRMATION_SUCCEED);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_CANCELLATION_CONFIRMATION_SUCCEED);
   });
 
-  it('next function should call error when the given booking evidence is not correct', async () => {
-    request.params.bid = 'bid';
-    const customError = new CustomError(BAD_REQUEST, ErrorType.Validation, BOOKING_EVIDENCE_ID_INVALID);
-    when(stubFindOne).calledWith(1).mockReturnValue(repositoryCreationEntity);
+  it('next function should call error when the given cancellation evidence is not correct', async () => {
+    request.params.cid = 'bid';
+    const customError = new CustomError(BAD_REQUEST, ErrorType.Validation, CANCELLATION_EVIDENCE_ID_INVALID);
+    when(stubFindOne).calledWith(1).mockReturnValue(repositoryBookedEntity);
 
-    await bookingConfirmation(request, fakeResponse, spyNext);
+    await cancellationConfirmation(request, fakeResponse, spyNext);
 
     expect(spyNext).toHaveBeenCalledWith(customError);
     expect(spyNext).toHaveBeenCalledTimes(1);
@@ -115,7 +113,7 @@ describe('booking conformation', () => {
   it('should call custom error when there is dummy error occured', async () => {
     stubFindOne.mockRejectedValue('dummy error');
 
-    await bookingConfirmation(request, fakeResponse, spyNext);
+    await cancellationConfirmation(request, fakeResponse, spyNext);
 
     expect(spyNext).toHaveBeenCalledWith(
       new CustomError(SERVER_ERROR, ErrorType.Raw, UNKNOWN_ERROR, null, 'dummy error'),

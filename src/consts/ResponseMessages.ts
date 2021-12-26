@@ -4,7 +4,12 @@ export const ORDER_BOOKING_REQUEST_BODY_VALIDATION_ERROR = 'Booking order valida
 
 export const ORDER_BOOKING_CONFIRMATION_REQUEST_BODY_VALIDATION_ERROR = 'Order booking confirmation validation error';
 
+export const ORDER_CANCELLATION_CONFIRMATION_REQUEST_BODY_VALIDATION_ERROR =
+  'Order cancellation confirmation validation error';
+
 export const ORDER_BOOKING_CONFIRMATION_SUCCEED = 'Booking confirmation has succeed';
+
+export const ORDER_CANCELLATION_CONFIRMATION_SUCCEED = 'Cancellation confirmation has succeed';
 
 export const ORDER_BOOKING_SUCCEED = 'Order is booking.';
 
@@ -26,3 +31,5 @@ export const ORDER_CREATED = 'Order successfully created.';
 export const UNKNOWN_ERROR = 'unknown error';
 
 export const BOOKING_EVIDENCE_ID_INVALID = 'The booking evidence id is not correct';
+
+export const CANCELLATION_EVIDENCE_ID_INVALID = 'The cancellation evidence id is not correct';

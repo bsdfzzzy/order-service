@@ -4,7 +4,7 @@ import { getRepository } from 'typeorm';
 import { OrderEntity } from 'typeorm/entities/orders/OrderEntity';
 
 import { cancel as cancelOrder } from '../../adapters/bookingEngine';
-import { ORDER_BOOKING_SUCCEED, ORDER_CANCELLING_SUCCEED, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
+import { ORDER_CANCELLING_SUCCEED, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
