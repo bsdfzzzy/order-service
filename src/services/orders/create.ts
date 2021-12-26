@@ -20,6 +20,7 @@ export const create = async (req: Request, res: Response, next: NextFunction) =>
       employee_id: employeeId,
       manager_id: managerId,
     });
+    await orderRepository.save(order);
     res.customSuccess(SUCCESS, ORDER_CREATED, new Order(order));
   } catch (e) {
     return next(new CustomError(SERVER_ERROR, ErrorType.Raw, UNKNOWN_ERROR, null, e));
