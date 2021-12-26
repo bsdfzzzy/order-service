@@ -25,7 +25,6 @@ export const book = async (req: Request, res: Response, next: NextFunction) => {
       identificationNumber,
       mobilePhone,
     });
-
     order.booking_evidence_id = bookingEvidenceId;
     order.status = OrderStatus.BOOKING;
 

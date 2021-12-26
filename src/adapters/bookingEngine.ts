@@ -18,12 +18,10 @@ import { CustomError } from '../utils/response/CustomError';
 
 export const booking = async (requestBody: BookingRequestBody): Promise<string> => {
   try {
-    const {
-      data: { evidenceId },
-    } = await axios.post('https://api-gateway.com/booking-system/bookings', requestBody, {
+    const response = await axios.post('http://localhost:4000/v1/booking-system/bookings', requestBody, {
       headers: { apiKey: 'apiKey' },
     });
-    return evidenceId;
+    return response.data.evidenceId;
   } catch (e) {
     throw new CustomError(SERVER_ERROR, ErrorType.thirdServiceError, BOOKING_SYSTEM_SERVER_ERROR_WHEN_BOOKING, [
       e.toString(),
@@ -35,7 +33,8 @@ export const getBookingInfo = async (bookingEvidenceId): Promise<BookingInfoResp
   try {
     const {
       data: { id, finished, result },
-    } = await axios.get(`https://api-gateway.com/booking-system/bookings/${bookingEvidenceId}`, {
+      // This url should be https://api-gateway.com in real. Here is a mock.
+    } = await axios.get(`http://localhost:4000/v1/booking-system/bookings/${bookingEvidenceId}`, {
       headers: { apiKey: 'apiKey' },
     });
     return {
@@ -57,7 +56,8 @@ export const cancel = async (requestBody: CancelRequestBody): Promise<string> =>
   try {
     const {
       data: { evidenceId },
-    } = await axios.post('https://api-gateway.com/booking-system/cancellations', requestBody, {
+      // This url should be https://api-gateway.com in real. Here is a mock.
+    } = await axios.post('http://localhost:4000/v1/booking-system/cancellations', requestBody, {
       headers: { apiKey: 'apiKey' },
     });
     return evidenceId;
@@ -72,7 +72,8 @@ export const getCancellationInfo = async (cancellationEvidenceId: string): Promi
   try {
     const {
       data: { id, finished, result },
-    } = await axios.get(`https://api-gateway.com/booking-system/cancellations/${cancellationEvidenceId}`, {
+      // This url should be https://api-gateway.com in real. Here is a mock.
+    } = await axios.get(`http://localhost:4000/v1/booking-system/cancellations/${cancellationEvidenceId}`, {
       headers: { apiKey: 'apiKey' },
     });
     return {

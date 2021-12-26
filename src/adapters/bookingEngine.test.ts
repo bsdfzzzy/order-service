@@ -7,12 +7,7 @@ import {
   BOOKING_SYSTEM_SERVER_ERROR_WHEN_GETTING_CANCELLATION_INFO,
   SERVER_ERROR,
 } from '../consts';
-import {
-  BookingRequestBody,
-  CancellationInfoResponse,
-  CancelRequestBody,
-  OrderBookingStatus,
-} from '../types/BookingEngine';
+import { BookingRequestBody, CancelRequestBody, OrderBookingStatus } from '../types/BookingEngine';
 import { ErrorType } from '../types/CustomError';
 import { CustomError } from '../utils/response/CustomError';
 
@@ -39,7 +34,7 @@ describe('bookingEngine', () => {
 
       const evidenceId = await booking(requestBody);
 
-      expect(axios.post).toHaveBeenCalledWith('https://api-gateway.com/booking-system/bookings', requestBody, {
+      expect(axios.post).toHaveBeenCalledWith('http://localhost:4000/v1/booking-system/bookings', requestBody, {
         headers: { apiKey: 'apiKey' },
       });
       expect(evidenceId).toEqual('booking_evidence_id');
@@ -76,7 +71,7 @@ describe('bookingEngine', () => {
 
       const response = await getBookingInfo(bookingEvidenceId);
 
-      expect(axios.get).toHaveBeenCalledWith('https://api-gateway.com/booking-system/bookings/booking_evidence_id', {
+      expect(axios.get).toHaveBeenCalledWith('http://localhost:4000/v1/booking-system/bookings/booking_evidence_id', {
         headers: { apiKey: 'apiKey' },
       });
       expect(response).toEqual({ id: 'booking_evidence_id', finished: true, result: OrderBookingStatus.SUCCEED });
@@ -117,7 +112,7 @@ describe('bookingEngine', () => {
 
       const evidenceId = await cancel(requestBody);
 
-      expect(axios.post).toHaveBeenCalledWith('https://api-gateway.com/booking-system/cancellations', requestBody, {
+      expect(axios.post).toHaveBeenCalledWith('http://localhost:4000/v1/booking-system/cancellations', requestBody, {
         headers: { apiKey: 'apiKey' },
       });
       expect(evidenceId).toEqual('cancellation_evidence_id');
@@ -155,7 +150,7 @@ describe('bookingEngine', () => {
       const response = await getCancellationInfo(cancellationEvidenceId);
 
       expect(axios.get).toHaveBeenCalledWith(
-        'https://api-gateway.com/booking-system/cancellations/cancellation_evidence_id',
+        'http://localhost:4000/v1/booking-system/cancellations/cancellation_evidence_id',
         {
           headers: { apiKey: 'apiKey' },
         },

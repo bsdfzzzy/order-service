@@ -1,6 +1,6 @@
 {
   "name": "order-service",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "RESTful API For Order Service.",
   "scripts": {
     "dev": "debug=* NODE_PATH=./src ts-node-dev --respawn ./src/index.ts",
@@ -11,8 +11,10 @@
     "lint-staged-husky": "lint-staged",
     "lint-prettier": "prettier --config .prettierrc --list-different '{src,test}/**/*.{ts,js,css,scss}'",
     "prettier": "prettier --config .prettierrc --write './**/*.{ts,js,css,scss,json,md}'",
-    "test": "NODE_PATH=./src mocha --require ts-node/register 'test/integration/**/*.test.ts' --timeout 20000 --exit",
-    "jest-test": "NODE_PATH=./src jest --coverage",
+    "unit-test": "NODE_PATH=./src jest --coverage",
+    "jest-integration-test": "PG_HOST=localhost NODE_PATH=./src jest -c jest.config.integration.js",
+    "prepare-for-integration-test": "docker-compose --file docker-compose.integration.yml --compatibility up -d",
+    "clean-after-integration-test": "docker-compose --file docker-compose.integration.yml down && rimraf database/order",
     "commit": "git-cz",
     "docker:dev": "docker-compose --file docker-compose.yml --file docker-compose.dev.yml --compatibility up --build",
     "docker:stage": "docker-compose --file docker-compose.yml --file docker-compose.stage.yml --compatibility up --build",
@@ -80,7 +82,7 @@
     "*": [
       "pretty-quick --staged"
     ],
-    "{src,test}/**/*.{js,ts}": [
+    "{src,integration-test}/**/*.{js,ts}": [
       "eslint --max-warnings 0"
     ]
   },
