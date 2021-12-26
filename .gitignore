@@ -7,10 +7,12 @@ tmp/
 temp/
 
 database/*
-!database/.gitkeep 
+!database/.gitkeep
 
 log/*
-!log/.gitkeep 
+!log/.gitkeep
+
+coverage
 
 # keep config folder with env files ONLY for demo purposes
 # config/
