@@ -7,6 +7,7 @@ import { OrderEntity } from '../../typeorm/entities/orders/OrderEntity';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
+import { Order } from '../models/order';
 
 import { create } from './create';
 
@@ -50,7 +51,11 @@ describe('create order', () => {
 
     await create(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, ORDER_CREATED, repositoryCreationEntity);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
+      SUCCESS,
+      ORDER_CREATED,
+      new Order(repositoryCreationEntity),
+    );
   });
 
   it('should call custom error when there is dummy error occured', async () => {

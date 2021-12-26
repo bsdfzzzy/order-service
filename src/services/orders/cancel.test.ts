@@ -1,8 +1,8 @@
 import { when } from 'jest-when';
 import { getRepository } from 'typeorm';
 
-import { booking } from '../../adapters/bookingEngine';
-import { ORDER_BOOKING_SUCCEED, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
+import * as bookingEngine from '../../adapters/bookingEngine';
+import { ORDER_CANCELLING_SUCCEED, SERVER_ERROR, SUCCESS, UNKNOWN_ERROR } from '../../consts';
 import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { ErrorType } from '../../types/CustomError';
 import { EmployeeInfo } from '../../types/Employee';
@@ -10,6 +10,7 @@ import { CustomError } from '../../utils/response/CustomError';
 import { Order } from '../models/order';
 
 import { book } from './book';
+import { cancel } from './cancel';
 
 jest.mock('typeorm', () => {
   const typeorm = jest.requireActual('typeorm');
@@ -20,19 +21,23 @@ jest.mock('typeorm', () => {
 });
 jest.mock('../../adapters/bookingEngine');
 
-const repositoryCreationEntity = {
-  id: 1,
-  product_id: 'product_id',
-  employee_id: 'employee_id',
-  status: OrderStatus.CREATED,
-};
-
-const updatedRepositoryCreationEntity = {
+const repositoryBookingEntity = {
   id: 1,
   product_id: 'product_id',
   employee_id: 'employee_id',
   status: OrderStatus.BOOKING,
   booking_evidence_id: 'booking_evidence_id',
+};
+
+const repositoryBookSucceedEntity = {
+  ...repositoryBookingEntity,
+  status: OrderStatus.BOOKING_SUCCESSED,
+};
+
+const updatedRepositoryCreationEntity = {
+  ...repositoryBookingEntity,
+  status: OrderStatus.CANCELLING,
+  cancellation_evidence_id: 'cancellation_evidence_id',
 };
 
 const employeeInfo: EmployeeInfo = {
@@ -45,9 +50,6 @@ describe('book order', () => {
   const request: any = {
     params: {
       id: 1,
-    },
-    body: {
-      ...employeeInfo,
     },
   };
   const spyCustomSuccess = jest.fn();
@@ -62,43 +64,47 @@ describe('book order', () => {
     save: stubSave,
   });
 
-  it('should successfully book order', async () => {
-    when(stubFindOne).calledWith(1).mockReturnValue(repositoryCreationEntity);
-    when(booking)
+  it('should successfully cancel order', async () => {
+    when(stubFindOne)
+      .calledWith(1)
+      .mockReturnValueOnce(repositoryBookingEntity)
+      .mockReturnValueOnce(repositoryBookSucceedEntity);
+    when(bookingEngine.cancel)
       .calledWith({
         orderId: 1,
-        productId: 'product_id',
-        ...employeeInfo,
+        bookingEvidenceId: 'booking_evidence_id',
       })
-      .mockResolvedValue('booking_evidence_id');
-    when(stubSave)
-      .calledWith({
-        ...repositoryCreationEntity,
-        status: OrderStatus.BOOKING,
-        booking_evidence_id: 'booking_evidence_id',
-      })
-      .mockResolvedValue(updatedRepositoryCreationEntity);
+      .mockResolvedValue('cancellation_evidence_id');
+    when(stubSave).calledWith(updatedRepositoryCreationEntity).mockResolvedValue(updatedRepositoryCreationEntity);
 
-    await book(request, fakeResponse, spyNext);
+    await cancel(request, fakeResponse, spyNext);
+    await cancel(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
+    expect(fakeResponse.customSuccess).toHaveBeenNthCalledWith(
+      1,
       SUCCESS,
-      ORDER_BOOKING_SUCCEED,
+      ORDER_CANCELLING_SUCCEED,
+      new Order(updatedRepositoryCreationEntity as any),
+    );
+    expect(fakeResponse.customSuccess).toHaveBeenNthCalledWith(
+      2,
+      SUCCESS,
+      ORDER_CANCELLING_SUCCEED,
       new Order(updatedRepositoryCreationEntity as any),
     );
   });
 
-  it('next function should call error when the book method rejects an error', async () => {
+  it('next function should call error when the cancel method rejects an error', async () => {
     const customError = new CustomError(SERVER_ERROR, ErrorType.thirdServiceError, 'any message');
-    when(booking)
+    when(stubFindOne).calledWith(1).mockReturnValueOnce(repositoryBookingEntity);
+    when(bookingEngine.cancel)
       .calledWith({
         orderId: 1,
-        productId: 'product_id',
-        ...employeeInfo,
+        bookingEvidenceId: 'booking_evidence_id',
       })
       .mockRejectedValue(customError);
 
-    await book(request, fakeResponse, spyNext);
+    await cancel(request, fakeResponse, spyNext);
 
     expect(spyNext).toHaveBeenCalledWith(customError);
     expect(spyNext).toHaveBeenCalledTimes(1);
@@ -108,7 +114,7 @@ describe('book order', () => {
   it('should call custom error when there is dummy error occured', async () => {
     stubFindOne.mockRejectedValue('dummy error');
 
-    await book(request, fakeResponse, spyNext);
+    await cancel(request, fakeResponse, spyNext);
 
     expect(spyNext).toHaveBeenCalledWith(
       new CustomError(SERVER_ERROR, ErrorType.Raw, UNKNOWN_ERROR, null, 'dummy error'),

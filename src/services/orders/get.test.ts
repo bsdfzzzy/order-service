@@ -8,6 +8,7 @@ import { OrderStatus } from '../../typeorm/entities/orders/types';
 import { OrderBookingStatus } from '../../types/BookingEngine';
 import { ErrorType } from '../../types/CustomError';
 import { CustomError } from '../../utils/response/CustomError';
+import { Order } from '../models/order';
 
 import { get } from './get';
 
@@ -58,7 +59,7 @@ describe('get order information', () => {
 
     await get(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, null, repositoryCreationEntity);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, null, new Order(repositoryCreationEntity));
   });
 
   it('should get booking information when order status is BOOKING', async () => {
@@ -71,14 +72,18 @@ describe('get order information', () => {
       });
     when(getBookingInfo)
       .calledWith('booking_evidence_id')
-      .mockResolvedValue({ finished: true, result: OrderBookingStatus.SUCCEED });
+      .mockResolvedValue({ id: 'booking_evidence_id', finished: true, result: OrderBookingStatus.SUCCEED });
     when(stubSave)
       .calledWith(bookingUpdatedRepositoryCreationEntity)
       .mockResolvedValue(bookingUpdatedRepositoryCreationEntity);
 
     await get(request, fakeResponse, spyNext);
 
-    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(SUCCESS, null, bookingUpdatedRepositoryCreationEntity);
+    expect(fakeResponse.customSuccess).toHaveBeenCalledWith(
+      SUCCESS,
+      null,
+      new Order(bookingUpdatedRepositoryCreationEntity),
+    );
   });
 
   it('should call custom error when there is dummy error occured', async () => {

@@ -2,14 +2,21 @@ import axios from 'axios';
 
 import {
   BOOKING_SYSTEM_SERVER_ERROR_WHEN_BOOKING,
+  BOOKING_SYSTEM_SERVER_ERROR_WHEN_CANCELLING,
   BOOKING_SYSTEM_SERVER_ERROR_WHEN_GETTING_BOOKING_INFO,
+  BOOKING_SYSTEM_SERVER_ERROR_WHEN_GETTING_CANCELLATION_INFO,
   SERVER_ERROR,
 } from '../consts';
-import { BookingRequestBody, OrderBookingStatus } from '../types/BookingEngine';
+import {
+  BookingRequestBody,
+  CancellationInfoResponse,
+  CancelRequestBody,
+  OrderBookingStatus,
+} from '../types/BookingEngine';
 import { ErrorType } from '../types/CustomError';
 import { CustomError } from '../utils/response/CustomError';
 
-import { booking, getBookingInfo } from './bookingEngine';
+import { booking, cancel, getBookingInfo, getCancellationInfo } from './bookingEngine';
 
 jest.mock('axios');
 
@@ -61,6 +68,7 @@ describe('bookingEngine', () => {
     it('should send a get request to 3rd service api gateway', async () => {
       (axios.get as jest.Mock).mockResolvedValue({
         data: {
+          id: bookingEvidenceId,
           finished: true,
           result: OrderBookingStatus.SUCCEED,
         },
@@ -71,7 +79,7 @@ describe('bookingEngine', () => {
       expect(axios.get).toHaveBeenCalledWith('https://api-gateway.com/booking-system/bookings/booking_evidence_id', {
         headers: { apiKey: 'apiKey' },
       });
-      expect(response).toEqual({ finished: true, result: OrderBookingStatus.SUCCEED });
+      expect(response).toEqual({ id: 'booking_evidence_id', finished: true, result: OrderBookingStatus.SUCCEED });
     });
 
     it('should throw custom error when booking system return error', async () => {
@@ -88,6 +96,87 @@ describe('bookingEngine', () => {
           SERVER_ERROR,
           ErrorType.thirdServiceError,
           BOOKING_SYSTEM_SERVER_ERROR_WHEN_GETTING_BOOKING_INFO,
+          [errorResponse.toString()],
+        ),
+      );
+    });
+  });
+
+  describe('cancel', () => {
+    const requestBody: CancelRequestBody = {
+      orderId: 1,
+      bookingEvidenceId: 'booking_evidence_id',
+    };
+
+    it('should post the request to 3rd service api gateway', async () => {
+      (axios.post as jest.Mock).mockResolvedValue({
+        data: {
+          evidenceId: 'cancellation_evidence_id',
+        },
+      });
+
+      const evidenceId = await cancel(requestBody);
+
+      expect(axios.post).toHaveBeenCalledWith('https://api-gateway.com/booking-system/cancellations', requestBody, {
+        headers: { apiKey: 'apiKey' },
+      });
+      expect(evidenceId).toEqual('cancellation_evidence_id');
+    });
+
+    it('should throw custom error when booking system return error', async () => {
+      const errorResponse = {
+        errors: {
+          errorCode: '0',
+          errorMessage: 'Server Error',
+        },
+      };
+      (axios.post as jest.Mock).mockRejectedValue(errorResponse);
+
+      await expect(cancel(requestBody)).rejects.toThrow(
+        new CustomError(SERVER_ERROR, ErrorType.thirdServiceError, BOOKING_SYSTEM_SERVER_ERROR_WHEN_CANCELLING, [
+          errorResponse.toString(),
+        ]),
+      );
+    });
+  });
+
+  describe('get cancellation information', () => {
+    const cancellationEvidenceId = 'cancellation_evidence_id';
+
+    it('should send a get request to 3rd service api gateway', async () => {
+      (axios.get as jest.Mock).mockResolvedValue({
+        data: {
+          id: cancellationEvidenceId,
+          finished: true,
+          result: OrderBookingStatus.SUCCEED,
+        },
+      });
+
+      const response = await getCancellationInfo(cancellationEvidenceId);
+
+      expect(axios.get).toHaveBeenCalledWith(
+        'https://api-gateway.com/booking-system/cancellations/cancellation_evidence_id',
+        {
+          headers: { apiKey: 'apiKey' },
+        },
+      );
+      expect(response).toEqual({ id: 'cancellation_evidence_id', finished: true, result: OrderBookingStatus.SUCCEED });
+    });
+
+    it('should throw custom error when booking system return error', async () => {
+      const errorResponse = {
+        errors: {
+          errorCode: '0',
+          errorMessage: 'Server Error',
+        },
+      };
+      (axios.get as jest.Mock).mockRejectedValue(errorResponse);
+
+      await expect(getCancellationInfo(cancellationEvidenceId)).rejects.toThrow(
+        new CustomError(
+          SERVER_ERROR,
+          ErrorType.thirdServiceError,
+          BOOKING_SYSTEM_SERVER_ERROR_WHEN_GETTING_CANCELLATION_INFO,
           [errorResponse.toString()],
         ),
       );
